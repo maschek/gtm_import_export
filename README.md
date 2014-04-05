@@ -67,3 +67,7 @@ To export a whole container into another one, you have to export/import the elem
 Open your issues here:
 https://github.com/maschek/gtm_import_export/issues
 
+## Donate
+
+If you found the script useful, why not consider a paypal donation?
+[Go to PayPal] (https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=adam%2emaschek%40gmail%2ecom&lc=US&item_name=Google%20Tag%20Manager%20script&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
