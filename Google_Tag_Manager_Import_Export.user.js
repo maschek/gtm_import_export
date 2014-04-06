@@ -2,8 +2,9 @@
 // @name        Google Tag Manager Import Export
 // @namespace   gtm_import_export.gm.maschek.hu
 // @description Google Tag Manager Import Export
-// @include     https://www.google.com/tagmanager/web/#management/TagManagement/*
+// @include     https://www.google.com/tagmanager/web/*
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
+// @downloadURL https://github.com/maschek/gtm_import_export/raw/master/Google_Tag_Manager_Import_Export.user.js
 // @see         https://github.com/maschek/gtm_import_export
 // @version     1
 // @grant       none
@@ -581,6 +582,35 @@
 
 
     /**
+     * Loads a script asynchronously and calls a callback when done.
+     *
+     * @see   http://davidwalsh.name/loading-scripts-jquery
+     * @param url      The url of the javascript to load
+     * @param callback The callback function to call when loaded
+     */
+    function loadScript(url, callback) {
+        $.ajax({
+            url         : url,
+            dataType    : 'script',
+            cache       : true,
+            crossDomain : true
+        }).done(callback);
+    }
+
+    /**
+     * Track a pageview with Google Analytics.
+     *
+     * Loads the Universal Analytics script and reports a pageview.
+     */
+    function trackUsage() {
+        loadScript('https://www.google-analytics.com/analytics.js', function() {
+            ga('create', 'UA-49741788-1', 'google.com');
+            ga('send', 'pageview');
+        });
+    }
+
+
+    /**
      * The main initialization function.
      *
      * The following operations are made:
@@ -597,7 +627,6 @@
      * The account id can also change while we navigate through the accounts and containers.
      */
     function init() {
-
 
         //inject styles
         $('body').append("<style>\
@@ -687,6 +716,8 @@
 
 
         }, 1500);
+
+        trackUsage();
 
 
     }//end init
