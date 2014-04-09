@@ -8,10 +8,10 @@ different GTM accounts and containers.
 ## Installation
 
 
-This script is only supported in Firefox and Greasemonkey. 
+This script is supported in Firefox and Greasemonkey or Chrome and Tampermonkey. 
 
- 1. Install [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)
- 2. Go to https://github.com/maschek/gtm_import_export/raw/master/Google_Tag_Manager_Import_Export.user.js and install the script into Greasemonkey.
+ 1. Install [Greasemonkey for Firefox](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) or [Tampermonkey for Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en)
+ 2. Go to https://github.com/maschek/gtm_import_export/raw/master/Google_Tag_Manager_Import_Export.user.js and install the script into Greasemonkey/Tampermonkey.
 
 ## Usage
 
