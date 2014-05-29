@@ -196,9 +196,9 @@
                 tagName  : post_data.tagName,
                 data     : post_data
             })
-            .done(function(data) {
-                handleImportResponse(data, this.tagName);
-            });
+                .done(function(data) {
+                    handleImportResponse(data, this.tagName);
+                });
         }
 
     }
@@ -241,9 +241,9 @@
                 conditionName : post_data.conditionName,
                 data          : post_data
             })
-            .done(function(data) {
-                handleImportResponse(data, this.conditionName);
-            });
+                .done(function(data) {
+                    handleImportResponse(data, this.conditionName);
+                });
         }
 
     }
@@ -286,9 +286,9 @@
                 macroName : post_data.macroName,
                 data      : post_data
             })
-            .done(function(data) {
-                handleImportResponse(data, this.macroName);
-            });
+                .done(function(data) {
+                    handleImportResponse(data, this.macroName);
+                });
         }
     }
 
@@ -308,14 +308,14 @@
             url       : '/tagmanager/web/getPage?TagManagementPage.mode=CONTAINER_OVERVIEW&containerOverview.tab=RULES&id=TagManagement&ds=' + CONTAINER_ID + '&hl=en_US&token=' + POST_TOKEN,
             dataType  : 'json'
         })
-        .done(function(data) {
+            .done(function(data) {
                 var resp = data.components[0].conditionTableContainer.row;
                 CONDITIONS[CONTAINER_ID] = [];
                 for (var i = 0; i < resp.length; i++) {
                     CONDITIONS[CONTAINER_ID][resp[i].name] = resp[i].conditionId;
                 }
 
-        });
+            });
 
     }
 
@@ -378,6 +378,8 @@
      * * ARBITRARY_HTML
      * * ARBITRARY_PIXEL
      * * ADWORDS_CONVERSION
+     * * GOOGLE_ANALYTICS -> TRACK_PAGEVIEW
+     * * GOOGLE_ANALYTICS -> TRACK_EVENT
      *
      * Other types will show 'skipping' in the status window.
      */
@@ -393,60 +395,83 @@
                 url      : "/tagmanager/web/getPage?TagManagementPage.mode=EDIT_TAG&TagManagementPage.tagId=" + $(element).data('tid') + "&id=TagManagement&ds=" + CONTAINER_ID,
                 dataType : 'json'
             })
-            .done(function(data) {
-                var component = data.components[0];
+                .done(function(data) {
+                    var component = data.components[0];
 
-                var new_obj = {
-                    tagName : component.tagData.name,
-                    tagType : component.tagData.type,
-                    scheduleStart : component.tagData.scheduleStart,
-                    scheduleEnd   : component.tagData.scheduleEnd,
-                    fireProdOnly  : component.tagData.liveOnly
-                };
+                    var new_obj = {
+                        tagName : component.tagData.name,
+                        tagType : component.tagData.type,
+                        scheduleStart : component.tagData.scheduleStart,
+                        scheduleEnd   : component.tagData.scheduleEnd,
+                        fireProdOnly  : component.tagData.liveOnly
+                    };
 
-                //watch out: not enough to export the IDs here, because they might be different in the target system
-                //we suppose the name will be unique and the same both in the source and the target
-                //if the name is the same, but the condition is indeed different, the script doesnt handle that!
-                new_obj.positiveCondition = component.positiveCondition;
-                new_obj.negativeCondition = component.negativeCondition;
+                    //watch out: not enough to export the IDs here, because they might be different in the target system
+                    //we suppose the name will be unique and the same both in the source and the target
+                    //if the name is the same, but the condition is indeed different, the script doesnt handle that!
+                    new_obj.positiveCondition = component.positiveCondition;
+                    new_obj.negativeCondition = component.negativeCondition;
 
 
-                //if custom html
-                if (new_obj.tagType == 'ARBITRARY_HTML') {
-                    $.extend(new_obj, {
-                        usePostscribe : component.customTagData.arbitraryHtml.usePostscribe,
-                        html          : component.customTagData.arbitraryHtml.template,
-                        enableNewJsMacroBehavior : true
-                    });
-                }
-                //if custom pixel
-                else if (new_obj.tagType == 'ARBITRARY_PIXEL') {
-                    var urlparts = component.tagData.arbitraryPixel.url.string.split('//');
-                    $.extend(new_obj, {
-                        urlScheme             : urlparts[0] + '//',
-                        urlRest               : urlparts[1],
-                        useCacheBuster        : component.tagData.arbitraryPixel.useCacheBuster,
-                        cacheBusterQueryParam : component.tagData.arbitraryPixel.cacheBusterQueryParam.string
-                    });
-                }
-                //if adwords conversion tracking
-                else if (new_obj.tagType == 'ADWORDS_CONVERSION') {
-                    $.extend(new_obj, {
-                        conversionId    : component.tagData.adwordsConversion.googleConversionId.string,
-                        conversionLabel : component.tagData.adwordsConversion.googleConversionLabel.string,
-                        conversionValue : component.tagData.adwordsConversion.googleConversionValue.string
-                    });
-                }
-                else {
-                    logMessage(new_obj.tagName + ': skipping. Unsupported type: ' + new_obj.tagType);
-                    return;
-                }
+                    //if custom html
+                    if (new_obj.tagType == 'ARBITRARY_HTML') {
+                        $.extend(new_obj, {
+                            usePostscribe : component.customTagData.arbitraryHtml.usePostscribe,
+                            html          : component.customTagData.arbitraryHtml.template,
+                            enableNewJsMacroBehavior : true
+                        });
+                    }
+                    //if custom pixel
+                    else if (new_obj.tagType == 'ARBITRARY_PIXEL') {
+                        var urlparts = component.tagData.arbitraryPixel.url.string.split('//');
+                        $.extend(new_obj, {
+                            urlScheme             : urlparts[0] + '//',
+                            urlRest               : urlparts[1],
+                            useCacheBuster        : component.tagData.arbitraryPixel.useCacheBuster,
+                            cacheBusterQueryParam : component.tagData.arbitraryPixel.cacheBusterQueryParam.string
+                        });
+                    }
+                    //if adwords conversion tracking
+                    else if (new_obj.tagType == 'ADWORDS_CONVERSION') {
+                        $.extend(new_obj, {
+                            conversionId    : component.tagData.adwordsConversion.googleConversionId.string,
+                            conversionLabel : component.tagData.adwordsConversion.googleConversionLabel.string,
+                            conversionValue : component.tagData.adwordsConversion.googleConversionValue.string
+                        });
+                    }
+                    //if Google Analytics Pageview
+                    else if (new_obj.tagType == 'GOOGLE_ANALYTICS' && component.tagData.googleAnalytics.type == 'TRACK_PAGEVIEW') {
+                        $.extend(new_obj, {
+                            webPropertyId: component.tagData.googleAnalytics.webPropertyId.string,
+                            trackType: component.tagData.googleAnalytics.type
+                        });
+                    }
+                    //if Google Analytics Event
+                    else if (new_obj.tagType == 'GOOGLE_ANALYTICS' && component.tagData.googleAnalytics.type == 'TRACK_EVENT') {
+                        $.extend(new_obj, {
+                            webPropertyId : component.tagData.googleAnalytics.webPropertyId.string,
+                            trackType : component.tagData.googleAnalytics.type,
+                            category: component.tagData.googleAnalytics.trackEvent.category.string,
+                            action: component.tagData.googleAnalytics.trackEvent.action.string
+                        });
 
-                pushToExport(new_obj, 'tagName');
-            });
+                        if (typeof component.tagData.googleAnalytics.trackEvent.label != 'undefined') {
+                            $.extend(new_obj, {label: component.tagData.googleAnalytics.trackEvent.label.string});
+                        }
+
+                        if (typeof component.tagData.googleAnalytics.trackEvent.value != 'undefined') {
+                            $.extend(new_obj, {value: component.tagData.googleAnalytics.trackEvent.value.string});
+                        }
+                    }
+                    // All Others
+                    else {
+                        logMessage(new_obj.tagName + ': skipping. Unsupported type: ' + new_obj.tagType);
+                        return;
+                    }
+
+                    pushToExport(new_obj, 'tagName');
+                });
         });
-
-
     }
 
     /**
@@ -470,16 +495,16 @@
                 url      : "/tagmanager/web/getPage?TagManagementPage.mode=EDIT_CONDITION&TagManagementPage.conditionId=" + $(element).data('tid') + "&id=TagManagement&ds=" + CONTAINER_ID,
                 dataType : 'json'
             })
-            .done(function(data) {
-                var component = data.components[0];
-                var new_obj = {
-                    conditionName : component.conditionName,
-                    //watch out: import expects predicateS (plural), but export provides predicate (singular)
-                    predicates    : JSON.stringify(component.predicate)
-                };
+                .done(function(data) {
+                    var component = data.components[0];
+                    var new_obj = {
+                        conditionName : component.conditionName,
+                        //watch out: import expects predicateS (plural), but export provides predicate (singular)
+                        predicates    : JSON.stringify(component.predicate)
+                    };
 
-                pushToExport(new_obj, 'conditionName');
-            });
+                    pushToExport(new_obj, 'conditionName');
+                });
         });
     }
 
@@ -513,68 +538,68 @@
                 url      : "/tagmanager/web/getPage?_.versionId=0&TagManagementPage.mode=EDIT_MACRO&TagManagementPage.macroId=" + $(element).data('tid') + "&id=TagManagement&ds=" + CONTAINER_ID,
                 dataType : 'json'
             })
-            .done(function(data) {
+                .done(function(data) {
 
-                var component = data.components[0];
+                    var component = data.components[0];
 
-                var new_obj = {
-                    macroType : component.macroData.type,
-                    macroName : component.macroData.name
-                }
+                    var new_obj = {
+                        macroType : component.macroData.type,
+                        macroName : component.macroData.name
+                    }
 
-                if (new_obj.macroType == 'CUSTOM_VAR') {
-                    new_obj.customVarName = component.macroData.customVarMacro.name.string;
-                }
-                else if (new_obj.macroType == 'COOKIE') {
-                    new_obj.cookieName = component.macroData.cookieMacro.name.string;
-                }
-                else if (new_obj.macroType == 'CONSTANT') {
-                    new_obj.macroValue = component.macroData.constantMacro.value.string;
-                }
-                else if (new_obj.macroType == 'EVENT') {
-                    //no additional data needed
-                }
-                else if (new_obj.macroType == 'REFERRER') {
-                    //no additional data needed
-                }
-                else if (new_obj.macroType == 'ARBITRARY_JAVASCRIPT') {
-                    new_obj.javascript = component.macroData.arbitraryJavascriptMacro.javascript.string;
-                }
-                else if (new_obj.macroType == 'AUTO_EVENT_VAR') {
-                    new_obj.varType      = component.macroData.autoEventVarMacro.varType;
-                    if (typeof component.macroData.autoEventVarMacro.defaultValue != 'undefined') {
-                        new_obj.defaultValue = component.macroData.autoEventVarMacro.defaultValue.string;
+                    if (new_obj.macroType == 'CUSTOM_VAR') {
+                        new_obj.customVarName = component.macroData.customVarMacro.name.string;
                     }
-                }
-                else if (new_obj.macroType == 'DOM_ELEMENT') {
-                    new_obj.elementId      = component.macroData.domElementMacro.elementId.string;
-                    if (typeof component.macroData.domElementMacro.attributeName != 'undefined') {
-                        new_obj.attributeName = component.macroData.domElementMacro.attributeName.string;
+                    else if (new_obj.macroType == 'COOKIE') {
+                        new_obj.cookieName = component.macroData.cookieMacro.name.string;
                     }
-                }
-                else if (new_obj.macroType == 'URL') {
-                    new_obj.urlComponentType      = component.macroData.urlMacro.component;
-                    if (typeof component.macroData.urlMacro.queryKey != 'undefined') {
-                        new_obj.queryKey = component.macroData.urlMacro.queryKey.string;
+                    else if (new_obj.macroType == 'CONSTANT') {
+                        new_obj.macroValue = component.macroData.constantMacro.value.string;
                     }
-                    if (typeof component.macroData.urlMacro.stripWww != 'undefined') {
-                        new_obj.stripWww = component.macroData.urlMacro.stripWww.boolean;
+                    else if (new_obj.macroType == 'EVENT') {
+                        //no additional data needed
                     }
-                    if (typeof component.macroData.urlMacro.defaultPages != 'undefined') {
-                        new_obj.defaultPages = '';
-                        for (var i = 0; i < component.macroData.urlMacro.defaultPages.listItem.length; i++) {
-                            new_obj.defaultPages+= component.macroData.urlMacro.defaultPages.listItem[i].string + "\n";
+                    else if (new_obj.macroType == 'REFERRER') {
+                        //no additional data needed
+                    }
+                    else if (new_obj.macroType == 'ARBITRARY_JAVASCRIPT') {
+                        new_obj.javascript = component.macroData.arbitraryJavascriptMacro.javascript.string;
+                    }
+                    else if (new_obj.macroType == 'AUTO_EVENT_VAR') {
+                        new_obj.varType      = component.macroData.autoEventVarMacro.varType;
+                        if (typeof component.macroData.autoEventVarMacro.defaultValue != 'undefined') {
+                            new_obj.defaultValue = component.macroData.autoEventVarMacro.defaultValue.string;
                         }
                     }
+                    else if (new_obj.macroType == 'DOM_ELEMENT') {
+                        new_obj.elementId      = component.macroData.domElementMacro.elementId.string;
+                        if (typeof component.macroData.domElementMacro.attributeName != 'undefined') {
+                            new_obj.attributeName = component.macroData.domElementMacro.attributeName.string;
+                        }
+                    }
+                    else if (new_obj.macroType == 'URL') {
+                        new_obj.urlComponentType      = component.macroData.urlMacro.component;
+                        if (typeof component.macroData.urlMacro.queryKey != 'undefined') {
+                            new_obj.queryKey = component.macroData.urlMacro.queryKey.string;
+                        }
+                        if (typeof component.macroData.urlMacro.stripWww != 'undefined') {
+                            new_obj.stripWww = component.macroData.urlMacro.stripWww.boolean;
+                        }
+                        if (typeof component.macroData.urlMacro.defaultPages != 'undefined') {
+                            new_obj.defaultPages = '';
+                            for (var i = 0; i < component.macroData.urlMacro.defaultPages.listItem.length; i++) {
+                                new_obj.defaultPages+= component.macroData.urlMacro.defaultPages.listItem[i].string + "\n";
+                            }
+                        }
 
-                }
-                else {
-                    logMessage(new_obj.macroName + ': skipping. Unsupported type: ' + new_obj.macroType);
-                    return;
-                }
+                    }
+                    else {
+                        logMessage(new_obj.macroName + ': skipping. Unsupported type: ' + new_obj.macroType);
+                        return;
+                    }
 
-                pushToExport(new_obj, 'macroName');
-            });
+                    pushToExport(new_obj, 'macroName');
+                });
         });
 
 
@@ -712,8 +737,6 @@
                     .on('click', '#import_tags', importTags)
                 ;
             }
-
-
 
         }, 1500);
 
