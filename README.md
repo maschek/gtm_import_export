@@ -25,13 +25,16 @@ Once installed, go to your GTM account and observe the new interface elements:
 2. Check the checkboxes of the elements you want to export, or use [Select/deselect all] button
 3. Click on [Export selected]
 4. The result of the export will appear in the top right textarea. Copy the content of this into your clipboard.
-5. Navigate to the account or container you want to import into
+5. Navigate to the target account or container you want to import into
 6. Navigate to the tab what you want to import (Tag, Rule or Macro)
 7. Paste your clipboard content into the top right textarea
 8. Hit import button
 9. Notice the messages in the top left textarea. If something went wrong, you will see here.
 
-Note: Only visible elements will be exported. To export all pages, you have to manually switch pages and export again.
+Notes:
+* Only visible elements will be exported. To export all pages, you have to manually switch pages and export again.
+* If a tag has a rule that is not present in the target container, the tag will be imported without the rule. You must first  import the required rules to avoid this.
+* Similarly, if a rule depends on a macro that is not present in the target container, you will have to import the macro first.
 
 Supported tags:
 * Custom HTML Tag
@@ -58,9 +61,14 @@ Unsupported elements will simply be skipped during export.
 ### Exporting a whole container
 
 To export a whole container into another one, you have to export/import the elements in the following order:
+
 1. Export/import all Macros
 2. Export/import all Rules
 3. Export/import all Tags
+
+Update:
+Google has developed a full container import/export functionality. You can read how it works here:
+https://support.google.com/tagmanager/answer/4540826?hl=en
 
 ## Issues
 
