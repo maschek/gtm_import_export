@@ -6,7 +6,7 @@
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js
 // @downloadURL https://github.com/maschek/gtm_import_export/raw/master/Google_Tag_Manager_Import_Export.user.js
 // @see         https://github.com/maschek/gtm_import_export
-// @version     1
+// @version     1.1
 // @grant       none
 // ==/UserScript==
 
