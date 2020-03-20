@@ -1,3 +1,6 @@
+# Archiving this repo as GTM updated their UI many years ago and AFAIK they also solved the export/import problem.
+
+
 Google Tag Manager Import Export Greasemonkey script
 =================
 
